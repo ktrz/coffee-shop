@@ -1,0 +1,9 @@
+:host {
+  display: flex;
+  flex-wrap: wrap;
+
+  app-coffee-item {
+    margin: 5px;
+    flex: 0 1 20%;
+  }
+}
