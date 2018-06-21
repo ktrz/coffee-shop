@@ -1,0 +1,27 @@
+:host {
+  display: flex;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 10px;
+
+
+  .status-icon {
+    padding: 5px;
+  }
+
+  .item-container {
+    &.requested {
+      background-color: aliceblue;
+    }
+    &.making {
+      background-color: lightyellow;
+    }
+    &.done {
+      background-color: lightgreen;
+    }
+    &.pickedUp {
+      background-color: lightgrey;
+    }
+  }
+
+}
