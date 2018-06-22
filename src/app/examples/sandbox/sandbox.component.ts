@@ -1,10 +1,7 @@
 import {Component} from '@angular/core';
-import {Subject} from 'rxjs/Subject';
+import {Subject, Observable, of, merge} from 'rxjs';
 import {delay, map, mergeMap, scan, share, startWith} from 'rxjs/operators';
 import {addStatus, CoffeeRequest, createCoffeeRequest, generateId} from '../../coffee-request';
-import {Observable} from 'rxjs/Observable';
-import {of} from 'rxjs/observable/of';
-import {merge} from 'rxjs/observable/merge';
 
 @Component({
   selector: 'app-sandbox',

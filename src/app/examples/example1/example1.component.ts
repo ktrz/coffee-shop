@@ -1,16 +1,18 @@
 import {Component} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
+import {merge, Observable, of, OperatorFunction, Subject, zip} from 'rxjs';
 import {delay, map, mergeMap, scan, share, startWith, tap} from 'rxjs/operators';
-import {Subject} from 'rxjs/Subject';
-import {of} from 'rxjs/observable/of';
-import {merge} from 'rxjs/observable/merge';
 import {addStatus, CoffeeRequest, CoffeeRequestStatus, createCoffeeRequest, generateId} from '../../coffee-request';
+
+
+const assignBaristaOperator: (barista$: Observable<any>) => OperatorFunction<CoffeeRequest, CoffeeRequest> =
+  barista$ => input => zip(input, barista$).pipe(map(([i]) => i));
 
 @Component({
   selector: 'app-example1',
   template: `
     <div>
       <button (click)="clicks$.next($event)">Add order</button>
+      <button (click)="barista$.next($event)">Barista available</button>
       <app-coffee-items [items]="state$ | async"></app-coffee-items>
     </div>
   `,
@@ -18,6 +20,7 @@ import {addStatus, CoffeeRequest, CoffeeRequestStatus, createCoffeeRequest, gene
 })
 export class Example1Component {
   clicks$: Subject<any> = new Subject();
+  barista$: Subject<any> = new Subject();
 
   coffeeReqs$: Observable<CoffeeRequest> = this.clicks$.pipe(
     map(generateId()),
@@ -27,7 +30,7 @@ export class Example1Component {
   );
 
   coffeeMaking$ = this.coffeeReqs$.pipe(
-    mergeMap(c => this.assignBarista(c)),
+    assignBaristaOperator(this.barista$),
     share()
   );
 
@@ -59,10 +62,6 @@ export class Example1Component {
       .filter(v => !!v)),
     startWith([])
   );
-
-  assignBarista(request: CoffeeRequest) {
-    return of(request).pipe(delay((request.id % 3 + 1) * 500));
-  }
 
   makeCoffee(request) {
     return of(request).pipe(delay(1500));
