@@ -9,11 +9,18 @@ export interface CoffeeRequest {
   id: number;
 }
 
-export interface CoffeeRequestStatus extends CoffeeRequest {
-  status: 'requested' | 'making' | 'done' | 'pickedUp';
+export enum CoffeeRequestStatusValue {
+  requested = 'requested',
+  making = 'making',
+  done = 'done',
+  pickedUp = 'pickedUp',
 }
 
-export const addStatus = status => map((request: CoffeeRequest): CoffeeRequestStatus => ({
+export interface CoffeeRequestStatus extends CoffeeRequest {
+  status: CoffeeRequestStatusValue;
+}
+
+export const setStatus = (status: CoffeeRequestStatusValue) => map((request: CoffeeRequest): CoffeeRequestStatus => ({
   ...request,
   status,
 }));

@@ -18,13 +18,15 @@
     "@angular/core": "^6.0.6",
     "@angular/forms": "^6.0.6",
     "@angular/http": "^6.0.6",
+    "@angular/material": "^6.4.6",
     "@angular/platform-browser": "^6.0.6",
     "@angular/platform-browser-dynamic": "^6.0.6",
     "@angular/router": "^6.0.6",
     "core-js": "^2.4.1",
     "font-awesome": "^4.7.0",
     "rxjs": "^6.2.1",
-    "zone.js": "^0.8.26"
+    "zone.js": "^0.8.26",
+    "@angular/cdk": "^6.2.0"
   },
   "devDependencies": {
     "@angular/cli": "^6.0.8",

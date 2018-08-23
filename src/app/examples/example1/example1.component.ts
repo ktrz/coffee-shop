@@ -1,18 +1,25 @@
 import {Component} from '@angular/core';
 import {merge, Observable, of, OperatorFunction, Subject, zip} from 'rxjs';
 import {delay, map, mergeMap, scan, share, startWith, tap} from 'rxjs/operators';
-import {addStatus, CoffeeRequest, CoffeeRequestStatus, createCoffeeRequest, generateId} from '../../coffee-request';
+import {
+  setStatus,
+  CoffeeRequest,
+  CoffeeRequestStatus,
+  CoffeeRequestStatusValue,
+  createCoffeeRequest,
+  generateId
+} from '../../coffee-request';
 
 
-const assignBaristaOperator: (barista$: Observable<any>) => OperatorFunction<CoffeeRequest, CoffeeRequest> =
+const assignBarista: (barista$: Observable<any>) => OperatorFunction<CoffeeRequest, CoffeeRequest> =
   barista$ => input => zip(input, barista$).pipe(map(([i]) => i));
 
 @Component({
   selector: 'app-example1',
   template: `
     <div>
-      <button (click)="clicks$.next($event)">Add order</button>
-      <button (click)="barista$.next($event)">Barista available</button>
+      <button mat-raised-button (click)="clicks$.next($event)">Add order</button>
+      <button mat-raised-button (click)="barista$.next($event)">Barista available</button>
       <app-coffee-items [items]="state$ | async"></app-coffee-items>
     </div>
   `,
@@ -30,25 +37,22 @@ export class Example1Component {
   );
 
   coffeeMaking$ = this.coffeeReqs$.pipe(
-    assignBaristaOperator(this.barista$),
-    share()
+    assignBarista(this.barista$)
   );
 
   coffeeDone$ = this.coffeeMaking$.pipe(
-    mergeMap(c => this.makeCoffee(c)),
-    share()
+    mergeMap(c => this.makeCoffee(c))
   );
 
   coffeePickedUp$ = this.coffeeDone$.pipe(
-    mergeMap(c => this.pickupCoffee(c)),
-    share()
+    mergeMap(c => this.pickupCoffee(c))
   );
 
   statuses$ = merge(
-    this.coffeeReqs$.pipe(addStatus('requested')),
-    this.coffeeMaking$.pipe(addStatus('making')),
-    this.coffeeDone$.pipe(addStatus('done')),
-    this.coffeePickedUp$.pipe(addStatus('pickedUp')),
+    this.coffeeReqs$.pipe(setStatus(CoffeeRequestStatusValue.requested)),
+    this.coffeeMaking$.pipe(setStatus(CoffeeRequestStatusValue.making)),
+    this.coffeeDone$.pipe(setStatus(CoffeeRequestStatusValue.done)),
+    this.coffeePickedUp$.pipe(setStatus(CoffeeRequestStatusValue.pickedUp)),
   );
 
   state$: Observable<any[]> = this.statuses$.pipe(
@@ -62,6 +66,10 @@ export class Example1Component {
       .filter(v => !!v)),
     startWith([])
   );
+
+  assignBarista(request) {
+    return of(request).pipe(delay(1500));
+  }
 
   makeCoffee(request) {
     return of(request).pipe(delay(1500));

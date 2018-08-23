@@ -1,17 +1,17 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {SandboxComponent} from './sandbox.component';
-import {CoffeeItemsComponent} from './coffee-items/coffee-items.component';
-import {CoffeeItemComponent} from './coffee-item/coffee-item.component';
+import {CoffeeItemsModule} from '../../shared/coffee-items/coffee-items.module';
+import {MatButtonModule} from '@angular/material';
 
 @NgModule({
   imports: [
-    CommonModule
+    CommonModule,
+    MatButtonModule,
+    CoffeeItemsModule
   ],
   declarations: [
     SandboxComponent,
-    CoffeeItemsComponent,
-    CoffeeItemComponent
   ],
   exports: [SandboxComponent],
 })

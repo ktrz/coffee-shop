@@ -1,0 +1,38 @@
+:host {
+  //display: flex;
+  //border: 1px solid black;
+  //border-radius: 5px;
+  //padding: 10px;
+
+  .order-content {
+    display: flex;
+    font-size: 1.5em;
+  }
+
+  .status-icon {
+    padding: 5px;
+    font-size: 2em;
+  }
+
+  .item-container {
+    flex: 1 0 auto;
+  }
+
+  .requested {
+    background-color: aliceblue;
+  }
+  .making {
+    background-color: lightyellow;
+  }
+  .done {
+    background-color: lightgreen;
+  }
+  .pickedUp {
+    background-color: lightgrey;
+  }
+
+  mat-progress-bar {
+    height: 10px;
+  }
+
+}

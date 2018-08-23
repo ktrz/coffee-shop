@@ -4,7 +4,7 @@
 // import {Subject} from 'rxjs/Subject';
 // import {of} from 'rxjs/observable/of';
 // import {merge} from 'rxjs/observable/merge';
-// import {addStatus, CoffeeRequest, CoffeeRequestStatus, createCoffeeRequest, generateId} from '../../coffee-request';
+// import {setStatus, CoffeeRequest, CoffeeRequestStatus, createCoffeeRequest, generateId} from '../../coffee-request';
 // import {zip} from 'rxjs/observable/zip';
 // import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 //
@@ -68,10 +68,10 @@
 //   );
 //
 //   statuses$ = merge(
-//     this.coffeeReqs$.pipe(addStatus('requested')),
-//     this.coffeeMaking$.pipe(addStatus('making')),
-//     this.coffeeDone$.pipe(addStatus('done')),
-//     this.coffeePickedUp$.pipe(addStatus('pickedUp')),
+//     this.coffeeReqs$.pipe(setStatus('requested')),
+//     this.coffeeMaking$.pipe(setStatus('making')),
+//     this.coffeeDone$.pipe(setStatus('done')),
+//     this.coffeePickedUp$.pipe(setStatus('pickedUp')),
 //   );
 //
 //   state$: Observable<any[]> = this.statuses$.pipe(

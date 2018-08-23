@@ -1,13 +1,13 @@
 import {Component} from '@angular/core';
 import {Subject, Observable, of, merge} from 'rxjs';
 import {delay, map, mergeMap, scan, share, startWith} from 'rxjs/operators';
-import {addStatus, CoffeeRequest, createCoffeeRequest, generateId} from '../../coffee-request';
+import {setStatus, CoffeeRequest, CoffeeRequestStatusValue, createCoffeeRequest, generateId} from '../../coffee-request';
 
 @Component({
   selector: 'app-sandbox',
   template: `
     <div>
-      <button (click)="clicks$.next($event)">Add order</button>
+      <button mat-raised-button (click)="clicks$.next($event)">Add order</button>
       <app-coffee-items [items]="state$ | async"></app-coffee-items>
     </div>
   `,
@@ -33,10 +33,10 @@ export class SandboxComponent {
   );
 
   state$ = merge(
-    this.coffeeRequests$.pipe(addStatus('requested')),
-    this.coffeeMaking$.pipe(addStatus('making')),
-    this.coffeeDone$.pipe(addStatus('done')),
-    this.coffeePickedUp$.pipe(addStatus('pickedUp')),
+    this.coffeeRequests$.pipe(setStatus(CoffeeRequestStatusValue.requested)),
+    this.coffeeMaking$.pipe(setStatus(CoffeeRequestStatusValue.making)),
+    this.coffeeDone$.pipe(setStatus(CoffeeRequestStatusValue.done)),
+    this.coffeePickedUp$.pipe(setStatus(CoffeeRequestStatusValue.pickedUp)),
   )
     .pipe(
       scan((state: any, v: any) => ({

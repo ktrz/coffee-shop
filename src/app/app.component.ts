@@ -4,9 +4,9 @@ import {Component} from '@angular/core';
   selector: 'app-root',
   template: `
     <div class="menu">
-    <a routerLink="/">Home</a>
-    <a routerLink="board">Board</a>
-    <a routerLink="sandbox">Sandbox</a>
+      <a routerLink="/">Home</a>
+      <a routerLink="board">Board</a>
+      <a routerLink="sandbox">Sandbox</a>
     </div>
     <router-outlet></router-outlet>
   `,
