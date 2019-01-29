@@ -1,12 +1,8 @@
 import {map} from 'rxjs/operators';
 
-export function generateId() {
+export function generateId(): () => number {
   let generatedId = 1;
   return () => generatedId++;
-}
-
-export interface CoffeeRequest {
-  id: number;
 }
 
 export enum CoffeeRequestStatusValue {
@@ -16,11 +12,12 @@ export enum CoffeeRequestStatusValue {
   pickedUp = 'pickedUp',
 }
 
-export interface CoffeeRequestStatus extends CoffeeRequest {
+export interface CoffeeRequest {
+  id: number;
   status: CoffeeRequestStatusValue;
 }
 
-export const setStatus = (status: CoffeeRequestStatusValue) => map((request: CoffeeRequest): CoffeeRequestStatus => ({
+export const setStatus = (status: CoffeeRequestStatusValue) => map((request: CoffeeRequest): CoffeeRequest => ({
   ...request,
   status,
 }));

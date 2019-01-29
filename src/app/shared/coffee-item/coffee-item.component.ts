@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {CoffeeRequestStatus, CoffeeRequestStatusValue} from '../../coffee-request';
+import {CoffeeRequest, CoffeeRequestStatusValue} from '../../coffee-request';
 
 @Component({
   selector: 'app-coffee-item',
@@ -25,6 +25,6 @@ import {CoffeeRequestStatus, CoffeeRequestStatusValue} from '../../coffee-reques
   styleUrls: ['./coffee-item.component.scss']
 })
 export class CoffeeItemComponent {
-  @Input() item: CoffeeRequestStatus;
+  @Input() item: CoffeeRequest;
   statusValues = CoffeeRequestStatusValue;
 }

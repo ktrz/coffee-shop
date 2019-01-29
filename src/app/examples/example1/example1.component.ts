@@ -1,15 +1,7 @@
 import {Component} from '@angular/core';
 import {merge, Observable, of, OperatorFunction, Subject, zip} from 'rxjs';
 import {delay, map, mergeMap, scan, share, startWith, tap} from 'rxjs/operators';
-import {
-  setStatus,
-  CoffeeRequest,
-  CoffeeRequestStatus,
-  CoffeeRequestStatusValue,
-  createCoffeeRequest,
-  generateId
-} from '../../coffee-request';
-
+import {CoffeeRequest, CoffeeRequestStatusValue, createCoffeeRequest, generateId, setStatus} from '../../coffee-request';
 
 const assignBarista: (barista$: Observable<any>) => OperatorFunction<CoffeeRequest, CoffeeRequest> =
   barista$ => input => zip(input, barista$).pipe(map(([i]) => i));
@@ -36,27 +28,30 @@ export class Example1Component {
     share()
   );
 
-  coffeeMaking$ = this.coffeeReqs$.pipe(
-    assignBarista(this.barista$)
+  coffeeMaking$: Observable<CoffeeRequest> = this.coffeeReqs$.pipe(
+    this.assignBarista(),
+    setStatus(CoffeeRequestStatusValue.making)
   );
 
-  coffeeDone$ = this.coffeeMaking$.pipe(
-    mergeMap(c => this.makeCoffee(c))
+  coffeeDone$: Observable<CoffeeRequest> = this.coffeeMaking$.pipe(
+    mergeMap(c => this.makeCoffee(c)),
+    setStatus(CoffeeRequestStatusValue.done)
   );
 
-  coffeePickedUp$ = this.coffeeDone$.pipe(
-    mergeMap(c => this.pickupCoffee(c))
+  coffeePickedUp$: Observable<CoffeeRequest> = this.coffeeDone$.pipe(
+    mergeMap(c => this.pickupCoffee(c)),
+    setStatus(CoffeeRequestStatusValue.pickedUp)
   );
 
   statuses$ = merge(
-    this.coffeeReqs$.pipe(setStatus(CoffeeRequestStatusValue.requested)),
-    this.coffeeMaking$.pipe(setStatus(CoffeeRequestStatusValue.making)),
-    this.coffeeDone$.pipe(setStatus(CoffeeRequestStatusValue.done)),
-    this.coffeePickedUp$.pipe(setStatus(CoffeeRequestStatusValue.pickedUp)),
+    this.coffeeReqs$,
+    this.coffeeMaking$,
+    this.coffeeDone$,
+    this.coffeePickedUp$,
   );
 
   state$: Observable<any[]> = this.statuses$.pipe(
-    scan((state: { [key: number]: CoffeeRequestStatus }, val: CoffeeRequestStatus) => ({
+    scan((state: { [key: number]: CoffeeRequest }, val: CoffeeRequest) => ({
         ...state,
         [val.id]: val,
       }),
@@ -67,8 +62,11 @@ export class Example1Component {
     startWith([])
   );
 
-  assignBarista(request) {
-    return of(request).pipe(delay(1500));
+  assignBarista(): OperatorFunction<CoffeeRequest, CoffeeRequest> {
+    return input => zip(input, this.barista$).pipe(
+      delay(500),
+      map(([i]) => i)
+    );
   }
 
   makeCoffee(request) {

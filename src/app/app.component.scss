@@ -1,4 +1,12 @@
 .menu {
   margin: 20px;
   font-size: 2em;
+
+  a {
+    margin-left: 20px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
 }
