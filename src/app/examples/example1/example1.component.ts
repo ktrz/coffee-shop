@@ -28,20 +28,11 @@ export class Example1Component {
     share()
   );
 
-  coffeeMaking$: Observable<CoffeeRequest> = this.coffeeReqs$.pipe(
-    this.assignBarista(),
-    setStatus(CoffeeRequestStatusValue.making)
-  );
+  coffeeMaking$: Observable<CoffeeRequest> = this.coffeeReqs$.pipe(this.assignBarista());
 
-  coffeeDone$: Observable<CoffeeRequest> = this.coffeeMaking$.pipe(
-    mergeMap(c => this.makeCoffee(c)),
-    setStatus(CoffeeRequestStatusValue.done)
-  );
+  coffeeDone$: Observable<CoffeeRequest> = this.coffeeMaking$.pipe(mergeMap(c => this.makeCoffee(c)));
 
-  coffeePickedUp$: Observable<CoffeeRequest> = this.coffeeDone$.pipe(
-    mergeMap(c => this.pickupCoffee(c)),
-    setStatus(CoffeeRequestStatusValue.pickedUp)
-  );
+  coffeePickedUp$: Observable<CoffeeRequest> = this.coffeeDone$.pipe(mergeMap(c => this.pickupCoffee(c)));
 
   statuses$ = merge(
     this.coffeeReqs$,
@@ -65,15 +56,22 @@ export class Example1Component {
   assignBarista(): OperatorFunction<CoffeeRequest, CoffeeRequest> {
     return input => zip(input, this.barista$).pipe(
       delay(500),
-      map(([i]) => i)
+      map(([i]) => i),
+      setStatus(CoffeeRequestStatusValue.making)
     );
   }
 
   makeCoffee(request) {
-    return of(request).pipe(delay(1500));
+    return of(request).pipe(
+      delay(1500),
+      setStatus(CoffeeRequestStatusValue.done)
+    );
   }
 
   pickupCoffee(request) {
-    return of(request).pipe(delay(1000));
+    return of(request).pipe(
+      delay(1000),
+      setStatus(CoffeeRequestStatusValue.pickedUp)
+    );
   }
 }
