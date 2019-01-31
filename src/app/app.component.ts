@@ -9,6 +9,7 @@ import {Component} from '@angular/core';
       <a routerLink="/3-barista">Barista fixed</a>
       <a routerLink="/4-made-picked">Coffee made and picked</a>
       <a routerLink="/5-barista-available">Barista available</a>
+      <a routerLink="/6-barista-check-in">Barista check-in</a>
       <a routerLink="sandbox">Sandbox</a>
     </div>
     <router-outlet></router-outlet>

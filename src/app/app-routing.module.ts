@@ -14,6 +14,8 @@ import {CoffeeMadeAndPickedComponent} from './examples/4-coffee-made-picked/coff
 import {CoffeeMadeAndPickedModule} from './examples/4-coffee-made-picked/coffee-made-and-picked.module';
 import {BaristaAvailableComponent} from './examples/5-barista-available/barista-available.component';
 import {BaristaAvailableModule} from './examples/5-barista-available/barista-available.module';
+import {BaristaCheckInComponent} from './examples/6-barista-check-in/barista-check-in.component';
+import {BaristaCheckInModule} from './examples/6-barista-check-in/barista-check-in.module';
 
 const routes: Routes = [{
   path: 'board',
@@ -36,6 +38,9 @@ const routes: Routes = [{
 }, {
   path: '5-barista-available',
   component: BaristaAvailableComponent,
+}, {
+  path: '6-barista-check-in',
+  component: BaristaCheckInComponent,
 }];
 
 @NgModule({
@@ -48,6 +53,7 @@ const routes: Routes = [{
     AssignBaristaReducedStateModule,
     CoffeeMadeAndPickedModule,
     BaristaAvailableModule,
+    BaristaCheckInModule,
   ],
   exports: [RouterModule]
 })

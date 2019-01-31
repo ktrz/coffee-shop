@@ -1,19 +1,23 @@
 import {Component} from '@angular/core';
-import {merge, Observable, of, OperatorFunction, Subject} from 'rxjs';
-import {CoffeeRequest, CoffeeRequestStatusValue, createCoffeeRequest, idGenerator, setStatus} from '../../coffee-request';
+import {merge, Observable, of, OperatorFunction, Subject, zip} from 'rxjs';
 import {delay, map, mergeMap, scan, share, startWith} from 'rxjs/operators';
+import {CoffeeRequest, CoffeeRequestStatusValue, createCoffeeRequest, idGenerator, setStatus} from '../../coffee-request';
 
 @Component({
-  selector: 'app-sandbox',
+  selector: 'app-barista-check-in',
   template: `
-    <h1>Sandbox</h1>
-    <button mat-raised-button (click)="clicks$.next($event)">Add order</button>
-    <app-coffee-items [items]="state$ | async"></app-coffee-items>
+    <div>
+      <h1>Barista available</h1>
+      <button mat-raised-button (click)="clicks$.next($event)">Add order</button>
+      <button mat-raised-button (click)="barista$.next($event)">Barista available</button>
+      <app-coffee-items [items]="state$ | async"></app-coffee-items>
+    </div>
   `,
-  styleUrls: ['./sandbox.component.scss']
+  styleUrls: ['./barista-check-in.component.scss']
 })
-export class SandboxComponent {
+export class BaristaCheckInComponent {
   clicks$: Subject<Event> = new Subject();
+  barista$: Subject<Event> = new Subject();
   coffeeReqs$: Observable<CoffeeRequest> = this.clicks$.pipe(
     map(idGenerator()),
     map(createCoffeeRequest),
@@ -38,10 +42,9 @@ export class SandboxComponent {
     );
 
   assignBarista(): OperatorFunction<CoffeeRequest, CoffeeRequest> {
-    return (source: Observable<CoffeeRequest>) => source.pipe(
-      mergeMap(request => of(request)),
-      delay(1000),
-      setStatus(CoffeeRequestStatusValue.making)
+    return (source: Observable<CoffeeRequest>) => zip(source, this.barista$).pipe(
+      map(([s]) => s),
+      setStatus(CoffeeRequestStatusValue.making),
     );
   }
 
