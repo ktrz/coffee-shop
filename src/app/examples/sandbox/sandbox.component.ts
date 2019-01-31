@@ -7,13 +7,13 @@ import {delay, map, mergeMap, scan, share, startWith} from 'rxjs/operators';
   selector: 'app-sandbox',
   template: `
     <h1>Sandbox</h1>
-    <button mat-raised-button (click)="clicks$.next($event)">Add order</button>
+    <button mat-raised-button (click)="clicks$.next()">Add order</button>
     <app-coffee-items [items]="state$ | async"></app-coffee-items>
   `,
   styleUrls: ['./sandbox.component.scss']
 })
 export class SandboxComponent {
-  clicks$: Subject<Event> = new Subject();
+  clicks$: Subject<void> = new Subject();
   coffeeReqs$: Observable<CoffeeRequest> = this.clicks$.pipe(
     map(idGenerator()),
     map(createCoffeeRequest),

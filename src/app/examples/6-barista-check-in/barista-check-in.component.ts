@@ -51,9 +51,7 @@ export class BaristaCheckInComponent {
       this.barista$.pipe(mapTo(1)),
       this.coffeeMaking$.pipe(mapTo(-1)),
     ).pipe(
-      scan((acc, v) => {
-        return acc + v;
-      }, 0),
+      scan((acc, v) => acc + v, 0),
       startWith(0)
     );
 
