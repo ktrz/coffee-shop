@@ -1,12 +1,13 @@
-import {map} from 'rxjs/operators';
+import {filter, map} from 'rxjs/operators';
 
-export function generateId(): () => number {
+export function idGenerator(): () => number {
   let generatedId = 1;
   return () => generatedId++;
 }
 
 export enum CoffeeRequestStatusValue {
   requested = 'requested',
+  assigned = 'assigned',
   making = 'making',
   done = 'done',
   pickedUp = 'pickedUp',
@@ -22,7 +23,11 @@ export const setStatus = (status: CoffeeRequestStatusValue) => map((request: Cof
   status,
 }));
 
+export const allowStatuses = (...statuses: CoffeeRequestStatusValue[]) =>
+  filter((request: CoffeeRequest) => !!statuses.find(status => status === request.status));
 
-export const createCoffeeRequest = id => ({
-  id,
+
+export const createCoffeeRequest: (id: number) => CoffeeRequest = id => ({
+  id: id,
+  status: CoffeeRequestStatusValue.requested,
 });

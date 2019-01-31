@@ -12,6 +12,7 @@ import {CoffeeRequest, CoffeeRequestStatusValue} from '../../coffee-request';
         </div>
         <div [ngSwitch]="item.status" class="status-icon">
           <i *ngSwitchCase="statusValues.requested" class="fa fa-check-circle-o"></i>
+          <i *ngSwitchCase="statusValues.assigned" class="fa fa-check-circle"></i>
           <i *ngSwitchCase="statusValues.making" class="fa fa-spinner fa-spin"></i>
           <i *ngSwitchCase="statusValues.done" class="fa fa-coffee"></i>
           <i *ngSwitchCase="statusValues.pickedUp" class="fa fa-check-circle"></i>

@@ -1,27 +1,22 @@
 import {Component} from '@angular/core';
-import {merge, of, Subject} from 'rxjs';
-import {CoffeeRequest, CoffeeRequestStatusValue, createCoffeeRequest, idGenerator, setStatus} from '../../coffee-request';
+import {Observable, of, OperatorFunction, Subject, merge} from 'rxjs';
 import {delay, map, mergeMap, scan, share, startWith} from 'rxjs/operators';
-import {Observable} from 'rxjs/internal/Observable';
-import {OperatorFunction} from 'rxjs/internal/types';
-import {zip} from 'rxjs/internal/observable/zip';
+import {CoffeeRequest, CoffeeRequestStatusValue, createCoffeeRequest, idGenerator, setStatus} from '../../coffee-request';
 
 @Component({
-  selector: 'app-sandbox',
+  selector: 'app-coffee-made-and-picked',
   template: `
     <div>
-      <h1>Sandbox</h1>
-      <button mat-raised-button (click)="click$.next()">Add order</button>
-      <button mat-raised-button (click)="barista$.next()">Barista available</button>
+      <h1>Coffee made and picked up example</h1>
+      <button mat-raised-button (click)="clicks$.next($event)">Add order</button>
       <app-coffee-items [items]="state$ | async"></app-coffee-items>
     </div>
   `,
-  styleUrls: ['./sandbox.component.scss']
+  styleUrls: ['./coffee-made-and-picked.component.scss']
 })
-export class SandboxComponent {
-  click$: Subject<Event> = new Subject();
-  barista$: Subject<Event> = new Subject();
-  coffeeReqs$: Observable<CoffeeRequest> = this.click$.pipe(
+export class CoffeeMadeAndPickedComponent {
+  clicks$: Subject<Event> = new Subject();
+  coffeeReqs$: Observable<CoffeeRequest> = this.clicks$.pipe(
     map(idGenerator()),
     map(createCoffeeRequest),
     share()
@@ -45,9 +40,10 @@ export class SandboxComponent {
     );
 
   assignBarista(): OperatorFunction<CoffeeRequest, CoffeeRequest> {
-    return (source: Observable<CoffeeRequest>) => zip(source, this.barista$).pipe(
-      map(([s]) => s),
-      setStatus(CoffeeRequestStatusValue.making),
+    return (source: Observable<CoffeeRequest>) => source.pipe(
+      mergeMap(request => of(request)),
+      delay(1000),
+      setStatus(CoffeeRequestStatusValue.making)
     );
   }
 

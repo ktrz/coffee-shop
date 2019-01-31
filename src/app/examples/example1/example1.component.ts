@@ -1,76 +1,98 @@
 import {Component} from '@angular/core';
-import {merge, Observable, of, OperatorFunction, Subject, zip} from 'rxjs';
+import {merge, Observable, of, OperatorFunction, Subject} from 'rxjs';
 import {delay, map, mergeMap, scan, share, startWith, tap} from 'rxjs/operators';
-import {CoffeeRequest, CoffeeRequestStatusValue, createCoffeeRequest, generateId, setStatus} from '../../coffee-request';
-
-const assignBarista: (barista$: Observable<any>) => OperatorFunction<CoffeeRequest, CoffeeRequest> =
-  barista$ => input => zip(input, barista$).pipe(map(([i]) => i));
+import {CoffeeRequest, CoffeeRequestStatusValue, createCoffeeRequest, idGenerator, setStatus} from '../../coffee-request';
 
 @Component({
   selector: 'app-example1',
   template: `
     <div>
       <button mat-raised-button (click)="clicks$.next($event)">Add order</button>
-      <button mat-raised-button (click)="barista$.next($event)">Barista available</button>
       <app-coffee-items [items]="state$ | async"></app-coffee-items>
     </div>
   `,
   styleUrls: ['./example1.component.scss']
 })
 export class Example1Component {
-  clicks$: Subject<any> = new Subject();
-  barista$: Subject<any> = new Subject();
+  clicks$: Subject<Event> = new Subject();
+  barista$: Subject<Event> = new Subject();
 
   coffeeReqs$: Observable<CoffeeRequest> = this.clicks$.pipe(
-    map(generateId()),
+    map(idGenerator()),
     map(createCoffeeRequest),
-    tap(console.log),
     share()
   );
 
   coffeeMaking$: Observable<CoffeeRequest> = this.coffeeReqs$.pipe(this.assignBarista());
 
-  coffeeDone$: Observable<CoffeeRequest> = this.coffeeMaking$.pipe(mergeMap(c => this.makeCoffee(c)));
+  coffeeDone$: Observable<CoffeeRequest> = this.coffeeMaking$.pipe(this.makeCoffee());
 
-  coffeePickedUp$: Observable<CoffeeRequest> = this.coffeeDone$.pipe(mergeMap(c => this.pickupCoffee(c)));
+  coffeePickedUp$: Observable<CoffeeRequest> = this.coffeeDone$.pipe(this.pickupCoffee());
 
   statuses$ = merge(
     this.coffeeReqs$,
     this.coffeeMaking$,
     this.coffeeDone$,
     this.coffeePickedUp$,
+  ).pipe(
+    tap(console.log.bind(console, 'status change:'))
   );
 
-  state$: Observable<any[]> = this.statuses$.pipe(
-    scan((state: { [key: number]: CoffeeRequest }, val: CoffeeRequest) => ({
-        ...state,
-        [val.id]: val,
-      }),
-      {}),
-    map(state => Object.keys(state)
-      .map(key => state[key])
-      .filter(v => !!v)),
-    startWith([])
-  );
+  state$: Observable<CoffeeRequest[]> =
+    this.statuses$.pipe(
+      scan((
+        state: { [key: number]: CoffeeRequest },
+        val: CoffeeRequest) => ({
+          ...state,
+          [val.id]: val,
+        }),
+        {}),
+      map(state => Object.keys(state)
+        .map(key => state[key])
+        .filter(v => !!v)),
+      startWith([])
+    );
 
   assignBarista(): OperatorFunction<CoffeeRequest, CoffeeRequest> {
-    return input => zip(input, this.barista$).pipe(
-      delay(500),
-      map(([i]) => i),
+    return (source: Observable<CoffeeRequest>) => source.pipe(
+      mergeMap(request => of(request)),
+      delay(5000),
       setStatus(CoffeeRequestStatusValue.making)
     );
+    // return input => {
+    //   const assigned$ = zip(input, this.barista$).pipe(
+    //     map(([i]) => i),
+    //     setStatus(CoffeeRequestStatusValue.assigned)
+    //   );
+    //   const making$ = assigned$.pipe(
+    //     delay(500),
+    //     setStatus(CoffeeRequestStatusValue.making)
+    //   );
+    //
+    //   return merge(assigned$, making$);
+    // };
   }
 
-  makeCoffee(request) {
-    return of(request).pipe(
-      delay(1500),
+  makeCoffee(): OperatorFunction<CoffeeRequest, CoffeeRequest> {
+    return (source: Observable<CoffeeRequest>) => source.pipe(
+      mergeMap(request => of(request)),
+      delay(5000),
       setStatus(CoffeeRequestStatusValue.done)
     );
+    // return (source: Observable<CoffeeRequest>) => source.pipe(
+    //   allowStatuses(CoffeeRequestStatusValue.making),
+    //   tap(console.log.bind(console, 'source:')),
+    //   mergeMap(request => of(request).pipe(
+    //     delay(1500),
+    //     setStatus(CoffeeRequestStatusValue.done)
+    //   ))
+    // );
   }
 
-  pickupCoffee(request) {
-    return of(request).pipe(
-      delay(1000),
+  pickupCoffee(): OperatorFunction<CoffeeRequest, CoffeeRequest> {
+    return (source: Observable<CoffeeRequest>) => source.pipe(
+      mergeMap(request => of(request)),
+      delay(5000),
       setStatus(CoffeeRequestStatusValue.pickedUp)
     );
   }

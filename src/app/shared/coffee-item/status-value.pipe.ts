@@ -9,6 +9,8 @@ export class StatusValuePipe implements PipeTransform {
     switch (value) {
       case CoffeeRequestStatusValue.requested:
         return 0;
+      case CoffeeRequestStatusValue.assigned:
+        return 10;
       case CoffeeRequestStatusValue.making:
         return 33;
       case CoffeeRequestStatusValue.done:
