@@ -1,24 +1,29 @@
 import {Component} from '@angular/core';
 import {merge, Observable, of, OperatorFunction, Subject, zip} from 'rxjs';
-import {delay, map, mergeMap, scan, share, startWith} from 'rxjs/operators';
+import {delay, map, mapTo, mergeMap, scan, share, startWith, switchMap} from 'rxjs/operators';
 import {CoffeeRequest, CoffeeRequestStatusValue, createCoffeeRequest, idGenerator, setStatus} from '../../coffee-request';
 
 @Component({
   selector: 'app-barista-check-in',
   template: `
+    <h1>Barista available</h1>
+    <button mat-raised-button (click)="click$.next()">Add order</button>
+    <button mat-raised-button (click)="baristaCheckIn$.next()">Barista check-in</button>
     <div>
-      <h1>Barista available</h1>
-      <button mat-raised-button (click)="clicks$.next($event)">Add order</button>
-      <button mat-raised-button (click)="barista$.next($event)">Barista available</button>
-      <app-coffee-items [items]="state$ | async"></app-coffee-items>
+      Baristas available: {{ baristasAvailable$ | async}}
     </div>
+    <app-coffee-items [items]="state$ | async"></app-coffee-items>
   `,
   styleUrls: ['./barista-check-in.component.scss']
 })
 export class BaristaCheckInComponent {
-  clicks$: Subject<Event> = new Subject();
-  barista$: Subject<Event> = new Subject();
-  coffeeReqs$: Observable<CoffeeRequest> = this.clicks$.pipe(
+  click$: Subject<void> = new Subject();
+  baristaCheckIn$: Subject<void> = new Subject();
+  barista$ = of(null).pipe(switchMap(() => merge(
+    this.baristaCheckIn$.asObservable(),
+    this.coffeeDone$
+  )));
+  coffeeReqs$: Observable<CoffeeRequest> = this.click$.pipe(
     map(idGenerator()),
     map(createCoffeeRequest),
     share()
@@ -39,6 +44,17 @@ export class BaristaCheckInComponent {
         .map(key => state[key])
         .filter(v => !!v)),
       startWith([])
+    );
+
+  baristasAvailable$ =
+    merge(
+      this.barista$.pipe(mapTo(1)),
+      this.coffeeMaking$.pipe(mapTo(-1)),
+    ).pipe(
+      scan((acc, v) => {
+        return acc + v;
+      }, 0),
+      startWith(0)
     );
 
   assignBarista(): OperatorFunction<CoffeeRequest, CoffeeRequest> {
