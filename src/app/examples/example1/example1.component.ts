@@ -1,8 +1,7 @@
 import {Component} from '@angular/core';
-import {merge, Observable, of, OperatorFunction, Subject} from 'rxjs';
-import {delay, map, mergeMap, scan, share, startWith} from 'rxjs/operators';
+import {merge, Observable, OperatorFunction, Subject, zip} from 'rxjs';
+import {delay, map, scan, share, startWith} from 'rxjs/operators';
 import {CoffeeRequest, CoffeeRequestStatusValue, createCoffeeRequest, idGenerator, setStatus} from '../../coffee-request';
-import {zip} from 'rxjs/internal/observable/zip';
 
 @Component({
   selector: 'app-example1',
@@ -50,7 +49,6 @@ export class Example1Component {
 
   makeCoffee(): OperatorFunction<CoffeeRequest, CoffeeRequest> {
     return (source: Observable<CoffeeRequest>) => source.pipe(
-      mergeMap(request => of(request)),
       delay(2000),
       setStatus(CoffeeRequestStatusValue.done)
     );
@@ -58,7 +56,6 @@ export class Example1Component {
 
   pickupCoffee(): OperatorFunction<CoffeeRequest, CoffeeRequest> {
     return (source: Observable<CoffeeRequest>) => source.pipe(
-      mergeMap(request => of(request)),
       delay(800),
       setStatus(CoffeeRequestStatusValue.pickedUp)
     );

@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
-import {merge, Observable, of, OperatorFunction, Subject} from 'rxjs';
+import {merge, Observable, OperatorFunction, Subject} from 'rxjs';
 import {CoffeeRequest, CoffeeRequestStatusValue, createCoffeeRequest, idGenerator, setStatus} from '../../coffee-request';
-import {delay, map, mergeMap, scan, share, startWith} from 'rxjs/operators';
+import {delay, map, scan, share, startWith} from 'rxjs/operators';
 
 @Component({
   selector: 'app-sandbox',
@@ -39,7 +39,6 @@ export class SandboxComponent {
 
   assignBarista(): OperatorFunction<CoffeeRequest, CoffeeRequest> {
     return (source: Observable<CoffeeRequest>) => source.pipe(
-      mergeMap(request => of(request)),
       delay(1000),
       setStatus(CoffeeRequestStatusValue.making)
     );
@@ -47,7 +46,6 @@ export class SandboxComponent {
 
   makeCoffee(): OperatorFunction<CoffeeRequest, CoffeeRequest> {
     return (source: Observable<CoffeeRequest>) => source.pipe(
-      mergeMap(request => of(request)),
       delay(2000),
       setStatus(CoffeeRequestStatusValue.done)
     );
@@ -55,7 +53,6 @@ export class SandboxComponent {
 
   pickupCoffee(): OperatorFunction<CoffeeRequest, CoffeeRequest> {
     return (source: Observable<CoffeeRequest>) => source.pipe(
-      mergeMap(request => of(request)),
       delay(800),
       setStatus(CoffeeRequestStatusValue.pickedUp)
     );
