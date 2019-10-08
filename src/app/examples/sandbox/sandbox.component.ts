@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {merge, Observable, OperatorFunction, Subject} from 'rxjs';
+import {merge, Observable, OperatorFunction, Subject, zip} from 'rxjs';
 import {CoffeeRequest, CoffeeRequestStatusValue, createCoffeeRequest, idGenerator, setStatus} from '../../coffee-request';
 import {delay, map, scan, share, startWith} from 'rxjs/operators';
 
@@ -8,12 +8,14 @@ import {delay, map, scan, share, startWith} from 'rxjs/operators';
   template: `
     <h1>Sandbox</h1>
     <button mat-raised-button (click)="clicks$.next()">Add order</button>
+    <button mat-raised-button (click)="barista$.next()">Barista available</button>
     <app-coffee-items [items]="state$ | async"></app-coffee-items>
   `,
   styleUrls: ['./sandbox.component.scss']
 })
 export class SandboxComponent {
   clicks$: Subject<void> = new Subject();
+  barista$: Subject<void> = new Subject();
   coffeeReqs$: Observable<CoffeeRequest> = this.clicks$.pipe(
     map(idGenerator()),
     map(createCoffeeRequest),
@@ -38,8 +40,8 @@ export class SandboxComponent {
     );
 
   assignBarista(): OperatorFunction<CoffeeRequest, CoffeeRequest> {
-    return (source: Observable<CoffeeRequest>) => source.pipe(
-      delay(1000),
+    return (source: Observable<CoffeeRequest>) => zip(source, this.barista$).pipe(
+      map(([s]) => s),
       setStatus(CoffeeRequestStatusValue.making)
     );
   }
